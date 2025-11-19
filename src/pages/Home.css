@@ -1,0 +1,213 @@
+/* 🌐 Estilos gerais */
+.home {
+  text-align: center;
+  padding: 150px 20px 20px 20px; 
+  font-family: 'Orbitron', sans-serif;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Overlay escuro */
+.home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Conteúdo acima do overlay */
+.home > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 🔥 ELEMENTOS FLUTUANTES (logo + título) */
+.floating-elements-home {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  z-index: 10;
+}
+
+/* LOGO */
+.featured-logo-home {
+  position: absolute;
+  top: -20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  max-width: 80%;
+  z-index: 10;
+}
+
+/* TÍTULO */
+.home-title {
+  position: absolute;
+  top: -5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 15px #0007;
+  z-index: 11;
+}
+
+/* 🔥 Distância segura antes do carrossel */
+.carousel-container {
+  margin-top: 160px; /* 👈 deixa igual ao seu segundo print */
+  position: relative;
+  z-index: 2;
+}
+
+/* Container dos cards */
+.product-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 40px 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* Cards */
+.product-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
+  padding: 15px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Imagem do produto */
+.product-img {
+  width: 80%;
+  height: 150px;
+  border-radius: 10px;
+}
+
+/* Texto do card */
+.product-title {
+  margin: 10px 0 5px;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.product-description {
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.product-price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 5px 0;
+  color: orange;
+  text-shadow: 0 0 6px rgba(255, 165, 0, 0.4);
+}
+
+/* Botão de compra */
+.product-btn {
+  display: inline-block;
+  padding: 8px 15px;
+  background: orange;
+  color: #fff;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.product-btn:hover {
+  background: darkorange;
+  transform: scale(1.05);
+}
+
+/* 📱 RESPONSIVIDADE */
+
+@media (max-width: 768px) {
+  .featured-logo-home {
+    top: -14vh;
+    width: 230px;
+  }
+
+  .home-title {
+    top: -2vh;
+    font-size: 1.8rem;
+  }
+}
+
+
+/* Celulares grandes (até 768px) */
+@media (max-width: 768px) {
+  .home {
+    padding: 120px 15px 15px;
+  }
+
+  .featured-logo-home {
+    top: -14vh;
+    width: 230px;
+  }
+
+  .home-title {
+    top: -2vh;
+    font-size: 1.8rem;
+  }
+
+  .product-container {
+    gap: 15px;
+  }
+
+  .product-card {
+    width: 180px;
+  }
+
+  .product-price {
+    font-size: 1rem;
+  }
+}
+
+/* Celulares pequenos (até 480px) */
+@media (max-width: 480px) {
+  .home {
+    padding: 110px 10px 10px;
+  }
+
+  .featured-logo-home {
+    top: -15vh;
+    width: 180px;
+  }
+
+  .home-title {
+    top: -6vh;   /* agora desce um pouco pra ficar visível */
+    font-size: 0.8rem;
+  }
+
+  .product-card {
+    width: 90%;
+    max-width: 300px;
+  }
+
+  .product-img {
+    height: 130px;
+  }
+
+  .product-price {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,216 @@
+/* 🧭 HEADER GERAL */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  animation: fadeDown 0.8s ease forwards;
+  opacity: 0;
+}
+/* 🔗 NAV LINKS — ESTILO PADRÃO PARA TODAS AS PÁGINAS */
+.header .nav-links a {
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  margin: 0 12px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.header .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+
+/* ✨ Animação */
+@keyframes fadeDown {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ============================
+   🎀 BEAUTY THEME
+   ============================ */
+.header-beauty {
+  background: linear-gradient(90deg, #f7c6df 10%, #f4a4ce 40%, #f18bc5 90%);
+  color: #ffffff;
+  font-family: "Great Vibes", cursive;
+  border-bottom: 4px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(255, 100, 180, 0.5);
+}
+
+/* LOGO BEAUTY */
+.header-beauty .logo {
+  font-family: "Great Vibes", cursive;
+  font-size: 1,5rem;
+  letter-spacing: 3px;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.8),
+               0 0 8px rgba(255, 120, 180, 0.5);
+}
+
+/* 🔍 Barra de pesquisa BEAUTY */
+.header-beauty .search-bar {
+  width: 35%;
+  padding: 8px 15px;
+  background: rgb(255, 220, 235); /* rosa suave */
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(255, 120, 180, 0.25); /* sombra rosa */
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid #d44fa4; /* borda rosa escuro */
+  color: #a4006e; /* texto rosa mais escuro */
+}
+
+.header-beauty .search-bar:focus {
+  border-color: #ff5ec8; /* rosa vibrante */
+  box-shadow: 0 0 12px rgba(255, 80, 180, 0.6); /* glow rosa */
+  background: rgb(255, 235, 245); /* fica mais clara no foco */
+  outline: none;
+}
+
+.header-beauty .search-bar::placeholder {
+  color: rgba(180, 0, 120, 0.6);
+}
+
+/* 🔗 Links */
+.header-beauty .nav-links a {
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  margin: 0 12px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+
+.header-beauty .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* ============================
+   🔹 DEFAULT (HOME)
+   ============================ */
+.header-default {
+  background: rgba(0, 0, 0, 0.6);
+  color: orange;
+  font-family: "Orbitron", sans-serif;
+}
+.search-bar {
+  width: 35%;
+  padding: 8px 15px;
+  background: rgb(82, 80, 80);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid #242323;
+  color: white;
+}
+
+.search-bar:focus {
+  border-color: #f3550c;
+  box-shadow: 0 0 12px rgba(243, 85, 12, 0.6);
+  background: rgb(100, 98, 98);
+  outline: none; /* tira o contorno azul feio */
+}
+/* ============================
+   🟢 FIT
+   ============================ */
+.header-fit {
+  background: linear-gradient(90deg, #00c853, #1abc9c);
+  color: #fff;
+  font-family: "Bebas Neue", sans-serif;
+}.header-fit .search-bar {
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid #00c853;
+  color: #004d25;
+}
+
+.header-fit .search-bar:focus {
+  border-color: #1abc9c;
+  box-shadow: 0 0 12px rgba(0, 255, 150, 0.5);
+}
+
+/* ============================
+   🔵 TECH
+   ============================ */
+.header-tech {
+  background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+  color: #00ffff;
+  font-family: "Orbitron", sans-serif;
+}
+
+/* 🔗 NAV LINKS GERAIS */
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.header-tech .search-bar {
+  background: rgba(0, 20, 40, 0.7);
+  border: 2px solid #00ffff;
+  color: #00ffff;
+}
+
+.header-tech .search-bar:focus {
+  border-color: #26f9ff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+}
+
+/* 🖋️ LOGO GERAL */
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+
+
+/* -------------------------------------
+   📱 RESPONSIVIDADE
+--------------------------------------*/
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 20px;
+  }
+
+  .header-beauty .logo {
+    font-size: 2.4rem;
+  }
+
+  .search-bar {
+    width: 80%;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .search-bar {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .header-beauty .logo {
+    font-size: 2rem;
+  }
+}

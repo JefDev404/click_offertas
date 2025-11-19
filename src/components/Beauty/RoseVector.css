@@ -1,0 +1,26 @@
+.vector-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 500px;
+    pointer-events: none;
+    z-index: 30;
+}
+
+.rose {
+    position: absolute;
+    width: 230px;
+    height: auto;
+    opacity: 0.9;
+}
+
+.rose.top-right {
+    transform: scale(-1, -1);
+}
+
+
+.rose.bottom-left {
+    bottom: 100px;
+    left: 200px;
+}

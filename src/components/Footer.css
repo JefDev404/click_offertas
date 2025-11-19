@@ -1,0 +1,20 @@
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: orange;
+  background: #000;
+  border-top: 1px solid #333;
+}
+.footer button {
+  background: transparent;
+  border: 1px solid orange;
+  color: orange;
+  border-radius: 10px;
+  padding: 6px 15px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.footer button:hover {
+  background: orange;
+  color: #000;
+}
