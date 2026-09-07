@@ -16,6 +16,8 @@ app.use("/uploads", express.static("uploads"));
 // todas as rotas
 app.use("/api", routes);
 
-app.listen(3001, () =>
-  console.log("API rodando na porta 3000")
-);
+// 🔥 MUDANÇA AQUI: Usar a porta do ambiente ou 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API rodando na porta ${PORT}`);
+});
