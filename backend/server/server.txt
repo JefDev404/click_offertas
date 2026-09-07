@@ -1,0 +1,370 @@
+import express from "express";
+import axios from "axios";
+import cors from "cors";
+import { load } from "cheerio";
+import produtosRoutes from "../routes/produtos.js";
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/produtos", produtosRoutes);
+
+/* ========================================================
+      EXTRATOR DE PLATAFORMA
+======================================================== */
+function detectarLoja(url) {
+  if (url.includes("shopee.com")) return "shopee";
+  if (url.includes("mercadolivre.com")) return "mercado_livre";
+  if (url.includes("amazon.")) return "amazon";
+  return null;
+}
+
+/* ========================================================
+      SHOPEE API OFICIAL
+======================================================== */
+function extractShopeeIds(url) {
+  const match = url.match(/i\.(\d+)\.(\d+)/);
+  if (!match) return null;
+  return { shopid: match[1], itemid: match[2] };
+}
+
+async function scrapShopee(url) {
+  try {
+    const ids = extractShopeeIds(url);
+    if (!ids) return { error: "URL Shopee inválida" };
+
+    const apiURL = `https://shopee.com.br/api/v4/item/get?itemid=${ids.itemid}&shopid=${ids.shopid}`;
+    const { data } = await axios.get(apiURL, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+
+    const item = data?.data;
+    if (!item) return { error: "Produto não encontrado" };
+
+    return {
+      title: item.name || null,
+      price: item.price ? item.price / 100000 : null,
+      old_price: item.price_before_discount
+        ? item.price_before_discount / 100000
+        : null,
+      image: item.image ? `https://cf.shopee.com.br/file/${item.image}` : null,
+      images: item.images
+        ? item.images.map(img => `https://cf.shopee.com.br/file/${img}`)
+        : null,
+      rating: item.item_rating?.rating_star || null,
+      sold: item.historical_sold || null,
+      shop_name: item.shop_info?.shop_name || null,
+      link: url,
+    };
+  } catch (err) {
+    return { error: "Erro Shopee" };
+  }
+}
+
+/* ========================================================
+      MERCADO LIVRE (Scraping funcional REAL)
+======================================================== */
+async function scrapMercadoLivre(url) {
+  try {
+    const { data: html } = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+    });
+
+    const $ = load(html);
+
+    // Título do produto
+    const titleFull = $("h1.ui-pdp-title").text().trim();
+    const shortTitle = titleFull ? titleFull.split(" ").slice(0, 6).join(" ") : null;
+
+    // Preço
+    let inteiro = $("span.andes-money-amount__fraction").first().text().trim();
+    let centavos = $("span.andes-money-amount__cents").first().text().trim() || "00";
+
+    // Remove pontos de milhar
+    inteiro = inteiro.replace(/\./g, "");
+
+    // Converte para número float
+    let price = parseFloat(`${inteiro}.${centavos}`);
+    if (isNaN(price)) price = null;
+
+    // Imagem principal
+    const image =
+      $("img.ui-pdp-image.ui-pdp-gallery__figure__image").attr("src") ||
+      $("img.ui-pdp-image.ui-pdp-gallery__figure__image").attr("data-src") ||
+      null;
+
+    return {
+      title: shortTitle,
+      price,      // já em número, igual Amazon
+      image,
+      link: url,
+    };
+  } catch (err) {
+    console.error("Erro Mercado Livre:", err.message);
+    return {
+      title: null,
+      price: null,
+      image: null,
+      link: url,
+      error: "Erro Mercado Livre",
+    };
+  }
+}
+
+// Exemplo de uso
+(async () => {
+  const url = "https://www.mercadolivre.com.br/creatina-100-pura-300g-hardcore/p/MLB6204289";
+  const produto = await scrapMercadoLivre(url);
+  console.log(produto);
+})();
+
+
+/* ========================================================
+      AMAZON (Scraping funcional REAL)
+======================================================== */
+async function scrapAmazon(url) {
+  try {
+    const { data: html } = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+    });
+
+    const $ = load(html);
+
+    const titleFull = $("#productTitle").text().trim();
+    const shortTitle = titleFull ? titleFull.split(" ").slice(0, 6).join(" ") : null;
+
+    let priceFull = $("#corePrice_feature_div .a-offscreen").first().text().trim();
+    if (!priceFull) priceFull = $(".a-price .a-offscreen").first().text().trim();
+    if (!priceFull) {
+      priceFull = null;
+    } else {
+      // converte para número
+      priceFull = parseFloat(priceFull.replace("R$", "").replace(".", "").replace(",", "."));
+    }
+
+    const image =
+      $("#imgTagWrapperId img").attr("src") ||
+      $("#landingImage").attr("src") ||
+      $("img[data-old-hires]").attr("data-old-hires") ||
+      null;
+
+    return {
+      title: shortTitle,
+      price: priceFull,
+      image,
+      link: url,
+    };
+  } catch (e) {
+    console.log("Erro Amazon:", e);
+    return {
+      title: null,
+      price: null,
+      image: null,
+      link: url,
+      error: "Erro Amazon",
+    };
+  }
+}
+
+/* ========================================================
+      ENDPOINT UNIFICADO
+======================================================== */
+app.post("/api/scrap", async (req, res) => {
+  const { url } = req.body;
+  const loja = detectarLoja(url);
+
+  if (!loja) return res.json({ error: "Loja não suportada" });
+
+  let result;
+
+  switch (loja) {
+    case "shopee":
+      result = await scrapShopee(url);
+      break;import express from "express";
+import axios from "axios";
+import cors from "cors";
+import { load } from "cheerio";
+import produtosRoutes from "../routes/produtos.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/api/produtos", produtosRoutes);
+
+/* ========================================================
+      EXTRATOR DE LOJA
+======================================================== */
+function detectarLoja(url) {
+  if (url.includes("shopee.com")) return "shopee";
+  if (url.includes("mercadolivre.com")) return "mercado_livre";
+  if (url.includes("amazon.")) return "amazon";
+  return null;
+}
+
+/* ========================================================
+      SHOPEE
+======================================================== */
+function extractShopeeIds(url) {
+  const match = url.match(/i\.(\d+)\.(\d+)/);
+  if (!match) return null;
+  return { shopid: match[1], itemid: match[2] };
+}
+
+async function scrapShopee(url) {
+  try {
+    const ids = extractShopeeIds(url);
+    if (!ids) return { error: "URL Shopee inválida" };
+
+    const apiURL = `https://shopee.com.br/api/v4/item/get?itemid=${ids.itemid}&shopid=${ids.shopid}`;
+    const { data } = await axios.get(apiURL, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+
+    const item = data?.data;
+    if (!item) return { error: "Produto não encontrado" };
+
+    return {
+      title: item.name || null,
+      price: item.price ? item.price / 100000 : null,
+      old_price: item.price_before_discount
+        ? item.price_before_discount / 100000
+        : null,
+      image: item.image ? `https://cf.shopee.com.br/file/${item.image}` : null,
+      images: item.images
+        ? item.images.map(img => `https://cf.shopee.com.br/file/${img}`)
+        : null,
+      rating: item.item_rating?.rating_star || null,
+      sold: item.historical_sold || null,
+      shop_name: item.shop_info?.shop_name || null,
+      link: url,
+    };
+  } catch (err) {
+    return { error: "Erro Shopee" };
+  }
+}
+
+/* ========================================================
+      MERCADO LIVRE
+======================================================== */
+async function scrapMercadoLivre(url) {
+  try {
+    const { data: html } = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+    });
+
+    const $ = load(html);
+
+    // Título
+    const titleFull = $("h1.ui-pdp-title").text().trim();
+    const shortTitle = titleFull ? titleFull.split(" ").slice(0, 6).join(" ") : null;
+
+    // Preço
+    let inteiro = $("span.andes-money-amount__fraction").first().text().trim();
+    let centavos = $("span.andes-money-amount__cents").first().text().trim() || "00";
+    inteiro = inteiro.replace(/\./g, ""); // remove pontos de milhar
+    let price = parseFloat(`${inteiro}.${centavos}`);
+    if (isNaN(price)) price = null;
+
+    // Imagem principal
+    const image =
+      $("img.ui-pdp-image.ui-pdp-gallery__figure__image").attr("src") ||
+      $("img.ui-pdp-image.ui-pdp-gallery__figure__image").attr("data-src") ||
+      null;
+
+    return { title: shortTitle, price, image, link: url };
+  } catch (err) {
+    console.error("Erro Mercado Livre:", err.message);
+    return { title: null, price: null, image: null, link: url, error: "Erro Mercado Livre" };
+  }
+}
+
+/* ========================================================
+      AMAZON
+======================================================== */
+async function scrapAmazon(url) {
+  try {
+    const { data: html } = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+    });
+
+    const $ = load(html);
+
+    const titleFull = $("#productTitle").text().trim();
+    const shortTitle = titleFull ? titleFull.split(" ").slice(0, 6).join(" ") : null;
+
+    let priceFull = $("#corePrice_feature_div .a-offscreen").first().text().trim();
+    if (!priceFull) priceFull = $(".a-price .a-offscreen").first().text().trim();
+    if (!priceFull) {
+      priceFull = null;
+    } else {
+      priceFull = parseFloat(priceFull.replace("R$", "").replace(".", "").replace(",", "."));
+    }
+
+    const image =
+      $("#imgTagWrapperId img").attr("src") ||
+      $("#landingImage").attr("src") ||
+      $("img[data-old-hires]").attr("data-old-hires") ||
+      null;
+
+    return { title: shortTitle, price: priceFull, image, link: url };
+  } catch (err) {
+    console.error("Erro Amazon:", err.message);
+    return { title: null, price: null, image: null, link: url, error: "Erro Amazon" };
+  }
+}
+
+/* ========================================================
+      ENDPOINT UNIFICADO
+======================================================== */
+app.post("/api/scrap", async (req, res) => {
+  const { url } = req.body;
+  const loja = detectarLoja(url);
+  if (!loja) return res.json({ error: "Loja não suportada" });
+
+  let result;
+  switch (loja) {
+    case "shopee":
+      result = await scrapShopee(url);
+      break;
+    case "mercado_livre":
+      result = await scrapMercadoLivre(url);
+      break;
+    case "amazon":
+      result = await scrapAmazon(url);
+      break;
+  }
+
+  res.json(result);
+});
+
+/* ========================================================
+      START
+======================================================== */
+app.listen(3001, () => console.log("API rodando na porta 3001"));
+
+    case "mercado_livre":
+      result = await scrapMercadoLivre(url);
+      break;
+    case "amazon":
+      result = await scrapAmazon(url);
+      break;
+  }
+
+  res.json(result);
+});
+
+/* ========================================================
+      START
+======================================================== */
+app.listen(3001, () => console.log("API rodando na porta 3001"));
