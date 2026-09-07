@@ -17,5 +17,5 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api", routes);
 
 app.listen(3001, () =>
-  console.log("API rodando na porta 3001")
+  console.log("API rodando na porta 3000")
 );
